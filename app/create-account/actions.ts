@@ -2,6 +2,8 @@
 
 import { z } from "zod";
 
+const passwordRegex = new RegExp(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*?[#?!@$%^&*-]).+$/);
+
 const checkPassword = ({ password, confirm_password }: { password: string; confirm_password: string }) =>
   password === confirm_password;
 
@@ -15,7 +17,13 @@ const formSchema = z
       .min(3, "Way too short!")
       .max(10, "That is too long!"),
     email: z.string().email(),
-    password: z.string().min(10),
+    password: z
+      .string()
+      .min(10)
+      .regex(
+        passwordRegex,
+        "Passwords must contain at least one UPPERCASE, lowercase, number and special characters #?!@$%^&*-",
+      ),
     confirm_password: z.string().min(10),
   })
   .refine(checkPassword, {
